@@ -4,7 +4,7 @@
 
 「どこに何を置くか」で迷う時間を減らし、別の人や将来の自分が見ても理解しやすい状態を作ることが目的です。
 
-Python Packaging Authority（PyPA）の [sampleproject](https://github.com/pypa/sampleproject) と [srcレイアウトの解説](https://packaging.python.org/ja/latest/discussions/src-layout-vs-flat-layout/) を参考にしつつ、小さな業務改善アプリ向けに簡略化しています。
+Python Packaging Authority（PyPA）の [sampleproject](https://github.com/pypa/sampleproject) などを参考にしつつ、仮想環境や事前インストールを必須にしない、小さな業務改善アプリ向けの構成に簡略化しています。
 
 ## 標準構成
 
@@ -14,7 +14,8 @@ my-python-app/
 ├── README.md
 ├── LICENSE
 ├── .gitignore
-├── pyproject.toml
+├── requirements.txt
+├── main.py
 ├── start.bat
 │
 ├── config/
@@ -26,12 +27,10 @@ my-python-app/
 │   └── architecture.md
 │
 ├── src/
-│   └── app/
-│       ├── __init__.py
-│       ├── __main__.py
-│       ├── core.py
-│       ├── config.py
-│       └── ui.py
+│   ├── __init__.py
+│   ├── core.py
+│   ├── config.py
+│   └── ui.py
 │
 ├── tests/
 │   └── test_core.py
@@ -47,7 +46,7 @@ my-python-app/
 └── logs/
 ```
 
-リポジトリ名の `my-python-app` はアプリごとに変更しますが、Pythonコードを置くパッケージ名は原則として `src/app/` に統一します。これにより、アプリごとに異なるパッケージ名を考える必要がありません。
+リポジトリ名の `my-python-app` はアプリごとに変更しますが、アプリ本体のPythonコードは原則として `src/` に置きます。利用者が直接実行する入口は、リポジトリ直下の `main.py` に統一します。
 
 ## 各場所の役割
 
@@ -57,13 +56,14 @@ my-python-app/
 | `README.md` | 概要、セットアップ、起動方法、使い方 | 登録する |
 | `LICENSE` | 利用条件 | 公開リポジトリでは登録する |
 | `.gitignore` | GitHubに載せないファイルを指定 | 登録する |
-| `pyproject.toml` | アプリ情報、依存ライブラリ、開発ツールの設定 | 登録する |
-| `start.bat` | Windowsで環境構築と起動を簡単にする | 登録する |
+| `requirements.txt` | 必要なPythonライブラリ | 登録する |
+| `main.py` | 利用者が実行する起動ファイル | 登録する |
+| `start.bat` | Windowsでライブラリの準備と起動を簡単にする | 登録する |
 | `config/config.example.yaml` | 設定項目の記入例 | 登録する |
 | `config/config.yaml` | 実際に使用する設定値 | 登録しない |
 | `docs/overview.md` | 困りごと、入力、出力、最初の完成条件 | 登録する |
 | `docs/architecture.md` | 処理の流れと設計判断 | 必要になったら登録する |
-| `src/app/` | アプリ本体のPythonコード | 登録する |
+| `src/` | アプリ本体のPythonコード | 登録する |
 | `tests/` | 自動テスト | 登録する |
 | `samples/` | 公開可能な架空データと期待結果 | 登録する |
 | `data/` | 実際の入出力データ | 原則として中身は登録しない |
@@ -71,27 +71,47 @@ my-python-app/
 
 ## Pythonコードの分け方
 
-### `src/app/__main__.py`
+### `main.py`
 
-アプリの起動地点です。画面表示や中心処理を呼び出します。
+利用者が実行するアプリの入口です。
 
-ここに業務処理を大量に書かず、処理の開始と終了が分かる小さなコードにします。
+処理の開始と終了だけが分かる小さなコードにし、業務処理や画面処理は `src/` 内の関数を呼び出します。
 
-### `src/app/core.py`
+標準の起動コマンドは次のとおりです。
+
+```powershell
+python main.py
+```
+
+### `src/core.py`
 
 アプリの中心となる業務処理を置きます。
 
 例えば、Excelの読み込み、集計、ファイル変換、ダウンロード対象の判定などです。GUIを使わなくても確認できる処理は、できるだけここへ置きます。
 
-### `src/app/config.py`
+### `src/config.py`
 
 設定ファイルを読み込み、設定値を検証する処理を置きます。設定ファイルを使用しない小さなアプリでは、作成しなくても構いません。
 
-### `src/app/ui.py`
+### `src/ui.py`
 
 Tkinter、Flet、Streamlitなどの画面処理を置きます。GUIがないアプリでは作成しません。
 
 画面から業務処理を直接すべて実行せず、原則として `core.py` の関数を呼び出します。
+
+## 仮想環境とライブラリ
+
+このスターターキットでは、仮想環境を標準では使用しません。
+
+利用者から明示的な指示があった場合にだけ、`venv`などの仮想環境を作成します。セットアップ手順や `start.bat`に、仮想環境の作成・有効化を自動的に追加してはいけません。
+
+必要なライブラリは `requirements.txt` に記載し、基本のインストール方法を次のようにします。
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+仮想環境を使わない場合、同じPython環境を使うほかのアプリとライブラリのバージョンが影響し合う可能性があります。実際に問題が起きた場合は状況を説明し、仮想環境を使うか利用者へ確認してください。許可なく作成してはいけません。
 
 ## 文書の役割
 
@@ -152,8 +172,8 @@ logs/*
 
 最初からすべてのファイルやフォルダを作る必要はありません。置き場所だけをこの文書で決め、必要になったときに追加します。
 
-- GUIが必要になったら `src/app/ui.py` を追加する
-- 設定を外から変更したくなったら `config/` と `src/app/config.py` を追加する
+- GUIが必要になったら `src/ui.py` を追加する
+- 設定を外から変更したくなったら `config/` と `src/config.py` を追加する
 - 処理の判断理由を残す必要が出たら `docs/architecture.md` を追加する
 - 中心処理を確認できるようになったら `tests/` を追加する
 
@@ -164,15 +184,3 @@ logs/*
 既存アプリを、この構成へ一度に作り直してはいけません。
 
 現在のアプリが動作している場合は、目的の変更に必要な範囲だけを整理します。全面移行を提案する場合は、得られる効果、影響範囲、確認方法を説明し、利用者の同意を得てから進めます。
-
-## 起動方法
-
-標準的な起動コマンドは、次の形を目標にします。
-
-```powershell
-python -m app
-```
-
-`src`レイアウトでは、通常、事前にプロジェクトを仮想環境へインストールする必要があります。この手順は `start.bat`で自動化し、初心者が毎回インストール方法を判断しなくてよいようにします。
-
-開発中の具体的なセットアップ方法は、各アプリのREADMEへ記載します。
