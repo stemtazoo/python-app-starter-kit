@@ -58,7 +58,7 @@ my-python-app/
 | `.gitignore` | GitHubに載せないファイルを指定 | 登録する |
 | `requirements.txt` | 必要なPythonライブラリ | 登録する |
 | `main.py` | 利用者が実行する起動ファイル | 登録する |
-| `start.bat` | Windowsでライブラリの準備と起動を簡単にする | 登録する |
+| `start.bat` | Windowsでダブルクリックによる準備と起動を可能にする | 登録する |
 | `config/config.example.yaml` | 設定項目の記入例 | 登録する |
 | `config/config.yaml` | 実際に使用する設定値 | 登録しない |
 | `docs/overview.md` | 困りごと、入力、出力、最初の完成条件 | 登録する |
@@ -98,6 +98,61 @@ python main.py
 Tkinter、Flet、Streamlitなどの画面処理を置きます。GUIがないアプリでは作成しません。
 
 画面から業務処理を直接すべて実行せず、原則として `core.py` の関数を呼び出します。
+
+## 起動用ファイル
+
+Windows向けアプリでは、最初の試作品が動作するようになった時点で、リポジトリ直下に `start.bat` を作成します。
+
+利用者向けの基本操作は、次のようにします。
+
+```text
+start.batをダブルクリックする
+```
+
+`start.bat`は、少なくとも次の処理を行います。
+
+1. バッチファイルがあるフォルダへ移動する
+2. 必要に応じて `requirements.txt`のライブラリを準備する
+3. アプリに合ったコマンドで起動する
+4. 失敗した場合は、エラーを確認できる状態で停止する
+
+基本形は次のとおりです。実際のアプリに合わせて、メッセージや起動コマンドを調整します。
+
+```bat
+@echo off
+chcp 65001 > nul
+cd /d "%~dp0"
+
+if exist requirements.txt (
+    python -m pip install -r requirements.txt
+    if errorlevel 1 (
+        echo.
+        echo 必要なライブラリをインストールできませんでした。
+        echo 表示されたエラーを確認してください。
+        pause
+        exit /b 1
+    )
+)
+
+python main.py
+if errorlevel 1 (
+    echo.
+    echo アプリの実行中にエラーが発生しました。
+    echo 表示されたエラーを確認してください。
+    pause
+    exit /b 1
+)
+```
+
+仮想環境の作成や有効化は含めません。利用者から明示的に指示された場合にだけ追加します。
+
+PC固有の絶対パス、利用者名、パスワード、APIキーなどを `start.bat`へ書いてはいけません。
+
+GUIがなく、処理結果をコマンド画面で確認するアプリでは、正常終了時にも `pause`を追加することを検討します。GUIアプリでは、正常終了後に不要なコマンド画面を残さないようにします。
+
+Flet、Streamlitなどで起動コマンドが異なる場合は、`python main.py`へ無理に統一せず、そのフレームワークに合った起動コマンドを使用します。
+
+macOSまたはLinux向けアプリでは、必要に応じて同じ役割の `start.sh`を作成します。
 
 ## 仮想環境とライブラリ
 
