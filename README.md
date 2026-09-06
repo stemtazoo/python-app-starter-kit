@@ -30,6 +30,25 @@ Windows向けアプリでは原則として`start.bat`を用意し、ダブル�
 
 開発原則、AI向けの指示、推奨ディレクトリ構成を整備しました。今後、開発の始め方、記録用テンプレート、サンプルを順次追加します。
 
+## 参考資料
+
+このスターターキットは、次の資料を参考にしています。ただし、初心者が小さな業務改善アプリを早く完成させる目的に合わせて、手順や構成を簡略化しています。
+
+- [GitHub Spec Kit](https://github.com/github/spec-kit)  
+  仕様、計画、タスク、実装をつなげるSpec-Driven Developmentの考え方を参考にしています。本リポジトリでは、試作までの負担を減らすため「小さく試作してから記録する」流れへ調整しています。
+- [Custom instructions with AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md)  
+  Codexが`AGENTS.md`を読み込む範囲や、階層ごとに指示を分ける方法を確認できます。
+- [PyPA sampleproject](https://github.com/pypa/sampleproject)  
+  Pythonプロジェクトで使われる基本的なファイルやディレクトリ構成の参考です。
+- [srcレイアウト対フラットレイアウト](https://packaging.python.org/ja/latest/discussions/src-layout-vs-flat-layout/)  
+  Pythonコードを`src/`へ分ける場合の利点と注意点を学べます。本リポジトリでは、事前インストールを必須にしない形へ簡略化しています。
+- [pip User Guide：Requirements Files](https://pip.pypa.io/en/stable/user_guide/#requirements-files)  
+  `requirements.txt`を使って必要なライブラリをインストールする方法の公式資料です。
+- [Python公式ドキュメント：`__main__`](https://docs.python.org/ja/3/library/__main__.html)  
+  Pythonプログラムの起動地点と、`if __name__ == "__main__":`の考え方を確認できます。
+- [GitHub公式 Python.gitignore](https://github.com/github/gitignore/blob/main/Python.gitignore)  
+  PythonプロジェクトでGitHubへ登録しないファイルを判断するための基準です。
+
 ## ライセンス
 
 このリポジトリは[MIT License](LICENSE)で公開しています。
