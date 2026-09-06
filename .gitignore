@@ -216,3 +216,27 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local application settings
+# Keep config/config.example.yaml in Git, but do not commit real settings.
+config/config.yaml
+
+# Business data and generated logs
+# Keep only placeholder files used to preserve empty directories.
+data/input/*
+!data/input/.gitkeep
+!data/input/README.md
+
+data/output/*
+!data/output/.gitkeep
+!data/output/README.md
+
+logs/*
+!logs/.gitkeep
+!logs/README.md
+
+# Manual backups created before copy-and-paste editing
+*.backup
+*.bak
+*.failed
+*_failed.py
