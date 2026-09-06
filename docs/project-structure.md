@@ -131,6 +131,7 @@ if errorlevel 1 (
     echo Pythonを起動できませんでした。
     echo Pythonがインストールされ、使用できる状態か確認してください。
     echo この画面のスクリーンショットを撮って相談してください。
+    echo 共有前に個人情報や秘密情報が映っていないか確認してください。
     pause
     exit /b 1
 )
@@ -140,6 +141,7 @@ if not exist main.py (
     echo 起動に必要な main.py が見つかりません。
     echo start.batとmain.pyが同じフォルダにあるか確認してください。
     echo この画面のスクリーンショットを撮って相談してください。
+    echo 共有前に個人情報や秘密情報が映っていないか確認してください。
     pause
     exit /b 1
 )
