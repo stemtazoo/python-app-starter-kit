@@ -112,9 +112,11 @@ start.batをダブルクリックする
 `start.bat`は、少なくとも次の処理を行います。
 
 1. バッチファイルがあるフォルダへ移動する
-2. 必要に応じて `requirements.txt`のライブラリを準備する
-3. アプリに合ったコマンドで起動する
-4. 失敗した場合は、エラーを確認できる状態で停止する
+2. Pythonを実行できるか確認する
+3. 起動に必要なファイルがあるか確認する
+4. 必要に応じて `requirements.txt`のライブラリを準備する
+5. アプリに合ったコマンドで起動する
+6. 失敗した場合は、エラーを確認できる状態で停止する
 
 基本形は次のとおりです。実際のアプリに合わせて、メッセージや起動コマンドを調整します。
 
@@ -122,6 +124,25 @@ start.batをダブルクリックする
 @echo off
 chcp 65001 > nul
 cd /d "%~dp0"
+
+python --version > nul 2>&1
+if errorlevel 1 (
+    echo.
+    echo Pythonを起動できませんでした。
+    echo Pythonがインストールされ、使用できる状態か確認してください。
+    echo この画面のスクリーンショットを撮って相談してください。
+    pause
+    exit /b 1
+)
+
+if not exist main.py (
+    echo.
+    echo 起動に必要な main.py が見つかりません。
+    echo start.batとmain.pyが同じフォルダにあるか確認してください。
+    echo この画面のスクリーンショットを撮って相談してください。
+    pause
+    exit /b 1
+)
 
 if exist requirements.txt (
     python -m pip install -r requirements.txt
@@ -145,6 +166,8 @@ if errorlevel 1 (
     exit /b 1
 )
 ```
+
+この事前確認を「Preflight check（実行前チェック）」と呼びます。アプリによって必須ファイルや起動コマンドが異なる場合は、そのアプリに合わせて変更します。
 
 仮想環境の作成や有効化は含めません。利用者から明示的に指示された場合にだけ追加します。
 
