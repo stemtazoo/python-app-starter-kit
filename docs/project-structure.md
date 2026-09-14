@@ -27,6 +27,9 @@ my-python-app/
 │   ├── overview.md
 │   └── architecture.md
 │
+├── packages/
+│   └── （オフライン用パッケージ。必要な場合だけ配置）
+│
 ├── src/
 │   ├── __init__.py
 │   ├── core.py
@@ -65,6 +68,7 @@ my-python-app/
 | `config/config.yaml` | 実際に使用する設定値 | 登録しない |
 | `docs/overview.md` | 困りごと、入力、出力、最初の完成条件 | 登録する |
 | `docs/architecture.md` | 処理の流れと設計判断 | 必要になったら登録する |
+| `packages/` | プロキシやネットワーク制限時に使うローカルPythonパッケージ | パッケージ本体は標準では登録しない |
 | `src/` | アプリ本体のPythonコード | 登録する |
 | `tests/` | 自動テスト | 登録する |
 | `samples/` | 公開可能な架空データと期待結果 | 登録する |
@@ -117,8 +121,9 @@ start.batをダブルクリックする
 2. Pythonを実行できるか確認する
 3. 起動に必要なファイルがあるか確認する
 4. 必要に応じて `requirements.txt`のライブラリを準備する
-5. アプリに合ったコマンドで起動する
-6. 失敗した場合は、エラーを確認できる状態で停止する
+5. `packages/` にオフライン用パッケージがある場合はローカルインストールを優先する
+6. アプリに合ったコマンドで起動する
+7. 失敗した場合は、エラーを確認できる状態で停止する
 
 基本形は次のとおりです。実際のアプリに合わせて、メッセージや起動コマンドを調整します。
 
@@ -149,10 +154,21 @@ if not exist main.py (
 )
 
 if exist requirements.txt (
-    python -m pip install -r requirements.txt
+    if exist packages\*.whl (
+        echo.
+        echo ローカルパッケージから必要なライブラリを準備します。
+        python -m pip install --no-index --find-links=packages -r requirements.txt
+    ) else (
+        echo.
+        echo インターネットから必要なライブラリを準備します。
+        python -m pip install -r requirements.txt
+    )
+
     if errorlevel 1 (
         echo.
         echo 必要なライブラリをインストールできませんでした。
+        echo プロキシなどでインターネットへ接続できない場合は、
+        echo packagesフォルダへオフライン用パッケージを配置できます。
         echo この画面のスクリーンショットを撮って相談してください。
         echo 共有前に個人情報や秘密情報が映っていないか確認してください。
         pause
@@ -224,6 +240,16 @@ macOSまたはLinux向けアプリでは、必要に応じて同じ役割の `ch
 python -m pip install -r requirements.txt
 ```
 
+会社PCなどでプロキシやネットワーク制限によりPyPIへ接続できない場合は、`packages/` に必要なパッケージを配置し、次のようにローカルだけからインストールします。
+
+```powershell
+python -m pip install --no-index --find-links=packages -r requirements.txt
+```
+
+オフライン用パッケージの準備方法は[オフライン環境でPythonパッケージを準備する](offline-packages.md)を参照してください。
+
+`packages/` にパッケージファイルがある場合は、`start.bat` でもローカルインストールを優先します。会社で使用する場合は、勤務先のソフトウェア利用、外部媒体、ライセンス、セキュリティ規程を優先してください。
+
 仮想環境を使わない場合、同じPython環境を使うほかのアプリとライブラリのバージョンが影響し合う可能性があります。実際に問題が起きた場合は状況を説明し、仮想環境を使うか利用者へ確認してください。許可なく作成してはいけません。
 
 ## 文書の役割
@@ -269,6 +295,7 @@ Quickコースの最初から必須にはしません。
 - `samples/`：個人情報や社内情報を含まない架空データ
 - `data/`：実際の業務で使用するデータ
 - `logs/`：実行履歴やエラー情報
+- `packages/`：オフラインインストール用の第三者パッケージ
 
 `.gitignore`では、少なくとも次を除外します。
 
@@ -277,11 +304,14 @@ config/config.yaml
 data/input/*
 data/output/*
 logs/*
+packages/*
 ```
 
 フォルダ自体をGitHubへ残す必要がある場合は、`.gitkeep`または説明用の`README.md`だけを例外として登録します。
 
 認証情報、個人情報、社内ファイル、実際のメールアドレス、PC固有の保存先を、サンプルやログへ含めてはいけません。
+
+第三者パッケージをGitHubへ登録する場合は、ファイルサイズだけでなく、ライセンス、再配布条件、勤務先の規程を確認します。標準では `packages/` のパッケージ本体をGitHubへ登録しません。
 
 ## 構成を増やすときのルール
 
@@ -292,6 +322,7 @@ logs/*
 - 処理の判断理由を残す必要が出たら `docs/architecture.md` を追加する
 - 中心処理を確認できるようになったら `tests/` を追加する
 - 最初の試作品が動き、変更後の確認を繰り返すようになったら `check.bat` を追加する
+- プロキシやネットワーク制限で通常の `pip install` が使えない場合は `packages/` を追加する
 
 新しい種類のフォルダを追加する前に、既存の置き場所で表現できないか確認します。
 
