@@ -110,6 +110,8 @@ python-app-starter-kit の方針に従って、
 
 Windows向けアプリでは原則として`start.bat`を用意し、ダブルクリックで起動できる状態を目指します。
 
+会社PCなどでプロキシやネットワーク制限によりPyPIへ接続できない場合は、アプリ直下の`packages/`に事前取得したパッケージを配置して、ローカルからインストールできるようにします。`packages/`にWheelファイルがある場合、`start.bat`はネットワークを使わずローカルインストールを優先します。詳しくは[オフライン環境でPythonパッケージを準備する](docs/offline-packages.md)を確認してください。
+
 最初の試作品が動き、変更後の確認を繰り返す段階では、Windows向けアプリに`check.bat`を用意します。`start.bat`は利用者がアプリを使う入口、`check.bat`は開発者やAIが構文やテストなどをまとめて確認する入口として役割を分けます。Quickコースでは、新しいツールを増やさず、現在のアプリに必要な最小限の確認から始めます。
 
 エラーが出たときは、コードを何度も変更する前に、まずエラー画面のスクリーンショットを撮ってAIへ伝えます。共有前に、個人情報や秘密情報が映っていないか確認します。
@@ -123,7 +125,9 @@ Windows向けアプリでは原則として`start.bat`を用意し、ダブル�
 - [開発原則](docs/development-principles.md)  
   初心者が途中で迷わず、小さな業務改善アプリを完成させるための基本方針です。
 - [推奨ディレクトリ構成](docs/project-structure.md)  
-  Pythonコード、設定、文書、テスト、業務データの標準的な置き場所です。
+  Pythonコード、設定、文書、テスト、業務データ、オフライン用パッケージの標準的な置き場所です。
+- [オフライン環境でPythonパッケージを準備する](docs/offline-packages.md)  
+  プロキシやネットワーク制限がある環境で、必要なパッケージを別PCなどで取得してローカルからインストールする方法です。
 - [チャット・データ取り扱いガイド](docs/security-and-privacy.md)  
   AIとのチャットやGitHubへ入力してはいけない情報と、安全な置き換え方です。
 - [コードを手作業で反映する方法](docs/copy-paste-guide.md)  
@@ -133,7 +137,7 @@ Windows向けアプリでは原則として`start.bat`を用意し、ダブル�
 
 ## 現在の状態
 
-スタートガイド、開発原則、AI向けの指示、推奨ディレクトリ構成、情報の取り扱い、手作業でのコード反映、エラー対応、起動前確認、復旧、進捗表示、変更後の確認入口（`check.bat`）、既存アプリを小さく安全に修正する流れを整備しました。今後、実際のアプリ制作や修正で得た内容をもとに、記録用テンプレートやサンプルを追加します。
+スタートガイド、開発原則、AI向けの指示、推奨ディレクトリ構成、情報の取り扱い、手作業でのコード反映、エラー対応、起動前確認、復旧、進捗表示、変更後の確認入口（`check.bat`）、既存アプリを小さく安全に修正する流れ、プロキシなどでPyPIへ接続できない場合のローカルパッケージ導入を整備しました。今後、実際のアプリ制作や修正で得た内容をもとに、記録用テンプレートやサンプルを追加します。
 
 ## 参考資料
 
@@ -150,7 +154,7 @@ Windows向けアプリでは原則として`start.bat`を用意し、ダブル�
 - [srcレイアウト対フラットレイアウト](https://packaging.python.org/ja/latest/discussions/src-layout-vs-flat-layout/)  
   Pythonコードを`src/`へ分ける場合の利点と注意点を学べます。本リポジトリでは、事前インストールを必須にしない形へ簡略化しています。
 - [pip User Guide：Requirements Files](https://pip.pypa.io/en/stable/user_guide/#requirements-files)  
-  `requirements.txt`を使って必要なライブラリをインストールする方法の公式資料です。
+  `requirements.txt`を使った通常のインストールに加え、`pip download`と`--no-index --find-links`を使ったローカルインストールの方法も確認できます。
 - [Python公式ドキュメント：`__main__`](https://docs.python.org/ja/3/library/__main__.html)  
   Pythonプログラムの起動地点と、`if __name__ == "__main__":`の考え方を確認できます。
 - [GitHub公式 Python.gitignore](https://github.com/github/gitignore/blob/main/Python.gitignore)  
